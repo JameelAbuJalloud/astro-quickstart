@@ -1,6 +1,5 @@
 ---
 import Layout from '../components/Layout.astro';
-import { createEffect, onCleanup } from 'solid-js';
 astro: markdown
 ---
 
@@ -14,6 +13,9 @@ astro: markdown
           <img src="https://user-images.githubusercontent.com/43764894/223559085-8ff69d2f-4247-427f-a3a6-d2036b00082a.png" alt="Netlify plus Astro banner">
         </div>
 		----------------
+<astro>
+  import { createEffect, onCleanup } from 'solid-js';
+
   let mediaRecorder;
   let recordedChunks = [];
 
@@ -79,6 +81,38 @@ astro: markdown
         console.log('The following error occurred: ' + err);
       });
   });
+</astro>
+
+<template>
+  <h1>Audio Recorder</h1>
+
+  <div id="controls">
+    <button disabled={isRecording} onclick={startRecording}>Record</button>
+    <button disabled={!isRecording && !recordedChunks.length} onclick={stopRecording}>Stop</button>
+    <button disabled={!recordedChunks.length || isRecording || isStopped} onclick={playRecording}>Play</button>
+  </div>
+
+  <div id="audioPlayerContainer">
+    <audio id="audioPlayer" controls></audio>
+  </div>
+</template>
+
+<style>
+  #controls {
+    margin-bottom: 20px;
+  }
+
+  button {
+    font-size: 16px;
+    padding: 10px 20px;
+    margin-right: 10px;
+  }
+
+  #audioPlayerContainer {
+    display: none;
+    margin-top: 20px;
+  }
+</style>
 		------------------
         <h2>
           This is a bare-bones Astro project that has everything you need to quickly deploy it to Netlify
