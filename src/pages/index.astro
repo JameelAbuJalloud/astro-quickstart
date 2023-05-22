@@ -1,5 +1,6 @@
 ---
 import Layout from '../components/Layout.astro';
+import { createEffect, onCleanup } from 'solid-js';
 ---
 
 <Layout title="Audio Classifier">
@@ -11,6 +12,73 @@ import Layout from '../components/Layout.astro';
         <div class="logo">
           <img src="https://user-images.githubusercontent.com/43764894/223559085-8ff69d2f-4247-427f-a3a6-d2036b00082a.png" alt="Netlify plus Astro banner">
         </div>
+		----------------
+  let mediaRecorder;
+  let recordedChunks = [];
+
+  let isRecording = false;
+  let isStopped = false;
+  let isPlaying = false;
+
+  const startRecording = () => {
+    isRecording = true;
+    isStopped = false;
+    isPlaying = false;
+
+    mediaRecorder.start();
+  };
+
+  const stopRecording = () => {
+    isRecording = false;
+    isStopped = true;
+    isPlaying = false;
+
+    mediaRecorder.stop();
+  };
+
+  const playRecording = () => {
+    isRecording = false;
+    isStopped = false;
+    isPlaying = true;
+
+    audioPlayer.play();
+  };
+
+  onCleanup(() => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop();
+    }
+  });
+
+  $: {
+    recordButton.disabled = isRecording;
+    stopButton.disabled = !isRecording && !recordedChunks.length;
+    playButton.disabled = !recordedChunks.length || isRecording || isStopped;
+    audioPlayer.src = recordedChunks.length ? URL.createObjectURL(new Blob(recordedChunks, { type: 'audio/webm' })) : '';
+  }
+
+  createEffect(() => {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then((stream) => {
+        mediaRecorder = new MediaRecorder(stream);
+
+        mediaRecorder.ondataavailable = (event) => {
+          recordedChunks.push(event.data);
+        };
+
+        mediaRecorder.onstop = () => {
+          if (!isPlaying) {
+            audioPlayer.src = URL.createObjectURL(new Blob(recordedChunks, { type: 'audio/webm' }));
+          }
+
+          recordedChunks = [];
+        };
+      })
+      .catch((err) => {
+        console.log('The following error occurred: ' + err);
+      });
+  });
+		------------------
         <h2>
           This is a bare-bones Astro project that has everything you need to quickly deploy it to Netlify
         </h2>
