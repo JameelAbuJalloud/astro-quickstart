@@ -36,8 +36,8 @@ astro: markdown
     isStopped = true;
     isPlaying = false;
 
-    mediaRecorder.stop();
-  };
+    mediaRecorder.stop()
+  }
 
   const playRecording = () => {
     isRecording = false;
@@ -45,7 +45,7 @@ astro: markdown
     isPlaying = true;
 
     audioPlayer.play()
-  };
+  }
 
   onCleanup(() => {
     if (mediaRecorder && mediaRecorder.state === 'recording') {
